@@ -1,17 +1,17 @@
-import React, { useState, createContext } from 'react'
+import React, { useState } from 'react'
 import { GoogleMap, LoadScript } from '@react-google-maps/api'
-import { Paper, Typography, useMediaQuery, Rating, Box } from '@mui/material'
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
+import { Typography, useMediaQuery } from '@mui/material'
+// import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
 import mapWhiteStyles from './mapWhiteStyles'
 import mapGreenStyles from './mapGreenStyles'
+import { useMap } from '../../context/MapContext'
 
 
-function Map({ setCoords, setBounds, bounds, coords, zoom }) {
+function Map() {
     const [mapStyle, setMapStyle] = useState(0)
     const [mapref, setMapRef] = useState(null);
-    const isMobile = useMediaQuery('(min-width:600px)')
-    const mapContext = createContext()
-
+    // const isMobile = useMediaQuery('(min-width:600px)')
+    const { zoom, setZoom, coords, setCoords, bounds, setBounds } = useMap()
 
     const containerStyle = {
         width: '100%',
@@ -52,14 +52,15 @@ function Map({ setCoords, setBounds, bounds, coords, zoom }) {
         setCoords({ lat: lat, lng: lng })
         let ne = mapref.getBounds().getNorthEast()
         let sw = mapref.getBounds().getSouthWest()
-
         setBounds({
             ne: {
                 lat: ne.lat(), lng: ne.lng()
             },
             sw: { lat: sw.lat(), lng: sw.lng() }
         })
+        setZoom(mapref.getZoom())
     }
+
 
     return (
         <>
@@ -80,6 +81,7 @@ function Map({ setCoords, setBounds, bounds, coords, zoom }) {
                 >
                 </GoogleMap>
                 <Typography p={1} variant='caption'>
+                    Zood({zoom})
                     Center({coords.lat}, {coords.lng})
                     Bound (ne({bounds.ne.lat}, {bounds.ne.lng}), sw({bounds.sw.lat}, {bounds.sw.lng}))
                 </Typography>

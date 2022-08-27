@@ -3,33 +3,37 @@ import { createContext, useContext, useState } from 'react'
 const mapContext = createContext()
 
 // show Hong Kong map as default
-const InitialZoom = 12
+const InitialZoom = 9
 const InitialCoords = {
-    lat: 21.610552780862964,
-    lng: 115.50263769778306
+    lat: 22.302711,
+    lng: 114.177216
 }
 const InitialBounds = {
     ne: {
-        lat: 27.375766965019274,
-        lng: 126.42304785403306
+        lat: 23.033882353080422,
+        lng: 115.55737347070313
     },
     sw: {
-        lat: 15.606212870473103,
-        lng: 104.58222754153306
+        lat: 21.567692232322745,
+        lng: 112.79705852929688
     }
 }
 
 export function MapContextProvider({ children }) {
+    const [refresh, setRefresh] = useState(false)
     const [zoom, setZoom] = useState(InitialZoom)
     const [coords, setCoords] = useState(InitialCoords)
     const [bounds, setBounds] = useState(InitialBounds)
 
+    const getMyLocation = () => {
+        navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
+            setCoords({ lat: latitude, lng: longitude })
+        })
+    }
 
     return (
         <mapContext.Provider value={{
-            zoom, setZoom,
-            coords, setCoords,
-            bounds, setBounds
+            refresh, setRefresh, zoom, setZoom, coords, setCoords, bounds, setBounds, getMyLocation
         }}>
             {children}
         </mapContext.Provider>
