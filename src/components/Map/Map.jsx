@@ -1,33 +1,24 @@
 import React, { useState } from 'react'
 import { GoogleMap, LoadScript } from '@react-google-maps/api'
-import { Typography, useMediaQuery } from '@mui/material'
-// import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
-import mapWhiteStyles from './mapWhiteStyles'
+import { Typography, Autocomplete, TextField } from '@mui/material'
+import { useMapContext } from '../../context/MapContext'
 import mapGreenStyles from './mapGreenStyles'
-import { useMap } from '../../context/MapContext'
+import mapWhiteStyles from './mapWhiteStyles'
+import mapDarkStyles from './mapDarkStyles'
+
+
+const styleList = [
+    'default',
+    'GreenStyles',
+    'WhiteStyles',
+    'DarkStyles'
+]
 
 
 function Map() {
-    const [mapStyle, setMapStyle] = useState(0)
+    const [value, setValue] = useState(styleList[0]);
     const [mapref, setMapRef] = useState(null);
-    // const isMobile = useMediaQuery('(min-width:600px)')
-    const { zoom, setZoom, coords, setCoords, bounds, setBounds } = useMap()
-
-    const containerStyle = {
-        width: '100%',
-        height: '80vh'
-    }
-
-    const options = {
-        styles: (mapStyle === 0 ? mapWhiteStyles : mapGreenStyles),
-        disableDefaultUI: true,
-        zoomControl: true,
-        mapTypeControl: true,
-        scaleControl: true,
-        streetViewControl: true,
-        rotateControl: true,
-        fullscreenControl: false
-    }
+    const { options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds } = useMapContext()
 
     const handleOnLoad = (map) => {
         setMapRef(map)
@@ -38,40 +29,45 @@ function Map() {
         }
     }
 
-    const handleMapStyle = () => {
-        if (mapStyle === 0) {
-            setMapStyle(1)
-        } else {
-            setMapStyle(0)
-        }
+    const handleClick = () => {
+        setZoom(mapref.getZoom())
+        setCoords({ lat: mapref.getCenter().lat(), lng: mapref.getCenter().lng() })
+        setBounds({
+            ne: { lat: mapref.getBounds().getNorthEast().lat(), lng: mapref.getBounds().getNorthEast().lng() },
+            sw: { lat: mapref.getBounds().getSouthWest().lat(), lng: mapref.getBounds().getSouthWest().lng() }
+        })
     }
 
-    const handleClick = () => {
-        let lat = mapref.getCenter().lat()
-        let lng = mapref.getCenter().lng()
-        setCoords({ lat: lat, lng: lng })
-        let ne = mapref.getBounds().getNorthEast()
-        let sw = mapref.getBounds().getSouthWest()
-        setBounds({
-            ne: {
-                lat: ne.lat(), lng: ne.lng()
-            },
-            sw: { lat: sw.lat(), lng: sw.lng() }
-        })
-        setZoom(mapref.getZoom())
+    const handleChange = (event, newValue) => {
+        setValue(newValue)
+        switch (newValue) {
+            case 'WhiteStyles':
+                setOptions({ ...options, styles: mapWhiteStyles })
+                break
+            case 'GreenStyles':
+                setOptions({ ...options, styles: mapGreenStyles })
+                break
+            case 'DarkStyles':
+                setOptions({ ...options, styles: mapDarkStyles })
+                break
+            default:
+                setOptions({ ...options, styles: null })
+        }
     }
 
 
     return (
         <>
             <LoadScript googleMapsApiKey="AIzaSyDyoQSxwHVG2HkR7mfplO--zn4l2ItFSvY"  >
-                <div style={{ position: 'relative', cursor: 'pointer' }} onClick={handleMapStyle}>
-                    <h2 style={{ position: 'absolute', top: '1px', right: '1px', margin: 0, padding: 2, zIndex: 10, color: 'red' }}>
-                        Map Background
-                    </h2>
+                <div style={{ position: 'relative', cursor: 'pointer' }}>
+                    <Autocomplete size='small' disablePortal options={styleList} value={value}
+                        onChange={handleChange}
+                        sx={{ position: 'absolute', top: '1px', right: '1px', zIndex: 10, width: 200, margin: 0, padding: 2, }}
+                        renderInput={(params) => <TextField {...params} label="Map Background" />}
+                    />
                 </div>
                 <GoogleMap
-                    mapContainerStyle={containerStyle}
+                    mapContainerStyle={{ width: '100%', height: '80vh' }}
                     center={coords}
                     zoom={zoom}
                     options={options}

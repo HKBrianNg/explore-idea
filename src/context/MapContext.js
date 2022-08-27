@@ -19,7 +19,20 @@ const InitialBounds = {
     }
 }
 
+const InitialOptions = {
+    styles: null,
+    disableDefaultUI: true,
+    zoomControl: true,
+    mapTypeControl: true,
+    scaleControl: true,
+    streetViewControl: true,
+    rotateControl: true,
+    fullscreenControl: false
+}
+
+
 export function MapContextProvider({ children }) {
+    const [options, setOptions] = useState(InitialOptions)
     const [refresh, setRefresh] = useState(false)
     const [zoom, setZoom] = useState(InitialZoom)
     const [coords, setCoords] = useState(InitialCoords)
@@ -31,15 +44,16 @@ export function MapContextProvider({ children }) {
         })
     }
 
+
     return (
         <mapContext.Provider value={{
-            refresh, setRefresh, zoom, setZoom, coords, setCoords, bounds, setBounds, getMyLocation
+            options, setOptions, refresh, setRefresh, zoom, setZoom, coords, setCoords, bounds, setBounds, getMyLocation
         }}>
             {children}
         </mapContext.Provider>
     )
 }
 
-export function useMap() {
+export function useMapContext() {
     return useContext(mapContext)
 }

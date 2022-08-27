@@ -3,12 +3,12 @@ import { CssBaseline, Grid, Box } from '@mui/material';
 import Header from '../Header/Header'
 import List from '../List/List'
 import Map from '../Map/Map'
-import { useMap } from '../../context/MapContext';
+import { useMapContext } from '../../context/MapContext';
 import { getPlacesData } from '../../api/index'
 
 
 function Home() {
-    const { refresh, coords, setCoords, bounds, getMyLocation } = useMap()
+    const { refresh, bounds, getMyLocation } = useMapContext()
     const [places, setPlaces] = useState([])
 
     // get my current location
