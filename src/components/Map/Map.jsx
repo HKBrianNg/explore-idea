@@ -59,6 +59,7 @@ function Map() {
     const getMyLocation = () => {
         navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
             setCoords({ lat: latitude, lng: longitude })
+            setZoom(11)
         })
     }
 

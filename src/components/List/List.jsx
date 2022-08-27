@@ -32,8 +32,8 @@ function List() {
                     </Box>
                 ) : (
                     <>
-                        <Stack display='flex'>
-                            <FormControl size='small' sx={{ minWidth: '150px', margin: '5px' }}>
+                        <Stack display='flex' spacing={1}>
+                            <FormControl size='small' fullWidth >
                                 <InputLabel>Type</InputLabel>
                                 <Select label="Type" value={type} onChange={(e) => setType(e.target.value)}>
                                     <MenuItem value="restaurants">Restaurants</MenuItem>
@@ -41,7 +41,7 @@ function List() {
                                     <MenuItem value="attractions">Attractions</MenuItem>
                                 </Select>
                             </FormControl>
-                            <Button variant='contained' size='medium' m='5px' onClick={handleGetData}>Get Data</Button>
+                            <Button variant='contained' size='medium' fullWidth onClick={handleGetData}>Get Data</Button>
                         </Stack>
                         <Grid container spacing={3} sx={{ height: '75vh', overflow: 'auto', }}>
                             {places?.map((place, i) => (
