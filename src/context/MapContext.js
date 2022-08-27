@@ -37,16 +37,10 @@ export function MapContextProvider({ children }) {
     const [coords, setCoords] = useState(InitialCoords)
     const [bounds, setBounds] = useState(InitialBounds)
 
-    const getMyLocation = () => {
-        navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
-            setCoords({ lat: latitude, lng: longitude })
-        })
-    }
-
 
     return (
         <mapContext.Provider value={{
-            options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds, getMyLocation
+            options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds
         }}>
             {children}
         </mapContext.Provider>

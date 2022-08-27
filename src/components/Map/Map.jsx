@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { GoogleMap, LoadScript } from '@react-google-maps/api'
-import { Typography, Autocomplete, TextField } from '@mui/material'
+import { Typography, Autocomplete, TextField, IconButton } from '@mui/material'
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useMapContext } from '../../context/MapContext'
 import mapGreenStyles from './mapGreenStyles'
 import mapWhiteStyles from './mapWhiteStyles'
@@ -18,7 +19,7 @@ const styleList = [
 function Map() {
     const [value, setValue] = useState(styleList[0]);
     const [mapref, setMapRef] = useState(null);
-    const { getMyLocation, options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds } = useMapContext()
+    const { options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds } = useMapContext()
 
     const handleOnLoad = (map) => {
         setMapRef(map)
@@ -55,12 +56,11 @@ function Map() {
         }
     }
 
-
-    // get my current location
-    useEffect(() => {
-        getMyLocation()
-        console.log('getMyLocation')
-    }, [])
+    const getMyLocation = () => {
+        navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
+            setCoords({ lat: latitude, lng: longitude })
+        })
+    }
 
 
     return (
@@ -72,6 +72,13 @@ function Map() {
                         sx={{ position: 'absolute', top: '1px', right: '1px', zIndex: 10, width: 200, margin: 0, padding: 2, }}
                         renderInput={(params) => <TextField {...params} label="Map Background" />}
                     />
+                </div>
+                <div style={{ position: 'relative', cursor: 'pointer' }}>
+                    <IconButton size='small' onClick={getMyLocation}
+                        sx={{ position: 'absolute', top: '1px', left: '180px', zIndex: 10, margin: 0, padding: 2, }}
+                    >
+                        <MyLocationIcon />
+                    </IconButton>
                 </div>
                 <GoogleMap
                     mapContainerStyle={{ width: '100%', height: '80vh' }}
