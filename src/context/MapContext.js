@@ -33,7 +33,6 @@ const InitialOptions = {
 
 export function MapContextProvider({ children }) {
     const [options, setOptions] = useState(InitialOptions)
-    const [refresh, setRefresh] = useState(false)
     const [zoom, setZoom] = useState(InitialZoom)
     const [coords, setCoords] = useState(InitialCoords)
     const [bounds, setBounds] = useState(InitialBounds)
@@ -47,7 +46,7 @@ export function MapContextProvider({ children }) {
 
     return (
         <mapContext.Provider value={{
-            options, setOptions, refresh, setRefresh, zoom, setZoom, coords, setCoords, bounds, setBounds, getMyLocation
+            options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds, getMyLocation
         }}>
             {children}
         </mapContext.Provider>

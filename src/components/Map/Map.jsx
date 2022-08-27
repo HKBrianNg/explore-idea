@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GoogleMap, LoadScript } from '@react-google-maps/api'
 import { Typography, Autocomplete, TextField } from '@mui/material'
 import { useMapContext } from '../../context/MapContext'
@@ -18,7 +18,7 @@ const styleList = [
 function Map() {
     const [value, setValue] = useState(styleList[0]);
     const [mapref, setMapRef] = useState(null);
-    const { options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds } = useMapContext()
+    const { getMyLocation, options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds } = useMapContext()
 
     const handleOnLoad = (map) => {
         setMapRef(map)
@@ -56,6 +56,13 @@ function Map() {
     }
 
 
+    // get my current location
+    useEffect(() => {
+        getMyLocation()
+        console.log('getMyLocation')
+    }, [])
+
+
     return (
         <>
             <LoadScript googleMapsApiKey="AIzaSyDyoQSxwHVG2HkR7mfplO--zn4l2ItFSvY"  >
@@ -76,6 +83,7 @@ function Map() {
                     onClick={handleClick}
                 >
                 </GoogleMap>
+
                 <Typography p={1} variant='caption'>
                     Zood({zoom})
                     Center({coords.lat}, {coords.lng})
