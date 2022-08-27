@@ -50,7 +50,7 @@ function Header() {
 
 
     return (
-        <AppBar position="static">
+        <AppBar position="sticky">
             <StyledToolbar>
                 <StyledTypography variant="h5">Explore Idea</StyledTypography>
                 <Box display='flex'>
