@@ -3,14 +3,15 @@ import { Box, CircularProgress, FormControl, InputLabel, Select, MenuItem, Grid,
 import PlaceDetails from '../PlaceDetails/PlaceDetails'
 import { useMapContext } from '../../context/MapContext'
 import { getPlacesData } from '../../api/index'
+import { usePlacesContext } from '../../context/PlacesContext'
 
 
 function List() {
     const [type, setType] = useState('restaurants')
-    const [places, setPlaces] = useState([])
+    // const [places, setPlaces] = useState([])
     const [isLoading, setIsloading] = useState(false)
     const { bounds } = useMapContext()
-
+    const { places, setPlaces } = usePlacesContext()
 
     const handleGetData = () => {
         setIsloading(true)

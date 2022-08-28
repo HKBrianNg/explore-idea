@@ -3,6 +3,7 @@ import { GoogleMap, LoadScript } from '@react-google-maps/api'
 import { Typography, Autocomplete, TextField, IconButton } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useMapContext } from '../../context/MapContext'
+import { usePlacesContext } from '../../context/PlacesContext';
 import mapGreenStyles from './mapGreenStyles'
 import mapWhiteStyles from './mapWhiteStyles'
 import mapDarkStyles from './mapDarkStyles'
@@ -20,6 +21,7 @@ function Map() {
     const [value, setValue] = useState(styleList[0]);
     const [mapref, setMapRef] = useState(null);
     const { options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds } = useMapContext()
+    const { places } = usePlacesContext()
 
     const handleOnLoad = (map) => {
         setMapRef(map)
@@ -86,6 +88,7 @@ function Map() {
                     center={coords}
                     zoom={zoom}
                     options={options}
+                    places={places}
                     onLoad={(map) => handleOnLoad(map)}
                     onCenterChanged={handleCenterChanged}
                     onClick={handleClick}
