@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { GoogleMap, LoadScript } from '@react-google-maps/api'
-import { Typography, Autocomplete, TextField, IconButton } from '@mui/material'
+import { Typography, Autocomplete, TextField, IconButton, Stack } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useMapContext } from '../../context/MapContext'
 import { usePlacesContext } from '../../context/PlacesContext';
@@ -15,31 +15,42 @@ const styleList = [
     'WhiteStyles',
     'DarkStyles'
 ]
-
+const InitialCoords = {
+    lat: 22.302711,
+    lng: 114.177216
+}
 
 function Map() {
     const [value, setValue] = useState(styleList[0]);
     const [mapref, setMapRef] = useState(null);
-    const { options, setOptions, zoom, setZoom, coords, setCoords, bounds, setBounds } = useMapContext()
+    const { options, setOptions, zoom, setZoom, coord, setCoord, centerCoord, setCenterCoord, bounds, setBounds } = useMapContext()
     const { places } = usePlacesContext()
+
+
 
     const handleOnLoad = (map) => {
         setMapRef(map)
     }
 
-    const handleCenterChanged = () => {
-        if (mapref) {
-        }
+    const handleCenterChanged = (event) => {
+        // if (mapref) {
+        //     setTimeout(() => {
+        //         setCenterCoord({ lat: mapref.getCenter().lat(), lng: mapref.getCenter().lng() })
+        //     }, 3000)
+        //     console.log("centerChange", centerCoord)
+        // }
     }
 
-    const handleClick = () => {
+    const handleOnClick = (ev) => {
         setZoom(mapref.getZoom())
-        setCoords({ lat: mapref.getCenter().lat(), lng: mapref.getCenter().lng() })
+        setCoord({ lat: ev.latLng.lat(), lng: ev.latLng.lng() })
+        setCenterCoord({ lat: mapref.getCenter().lat(), lng: mapref.getCenter().lng() })
         setBounds({
             ne: { lat: mapref.getBounds().getNorthEast().lat(), lng: mapref.getBounds().getNorthEast().lng() },
             sw: { lat: mapref.getBounds().getSouthWest().lat(), lng: mapref.getBounds().getSouthWest().lng() }
         })
     }
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue)
@@ -60,10 +71,11 @@ function Map() {
 
     const getMyLocation = () => {
         navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
-            setCoords({ lat: latitude, lng: longitude })
+            setCenterCoord({ lat: latitude, lng: longitude })
             setZoom(11)
         })
     }
+
 
 
     return (
@@ -85,21 +97,24 @@ function Map() {
                 </div>
                 <GoogleMap
                     mapContainerStyle={{ width: '100%', height: '80vh' }}
-                    center={coords}
+                    center={centerCoord}
                     zoom={zoom}
                     options={options}
-                    places={places}
                     onLoad={(map) => handleOnLoad(map)}
                     onCenterChanged={handleCenterChanged}
-                    onClick={handleClick}
+                    onClick={ev => handleOnClick(ev)}
                 >
                 </GoogleMap>
-
-                <Typography p={1} variant='caption'>
-                    Zood({zoom})
-                    Center({coords.lat}, {coords.lng})
-                    Bound (ne({bounds.ne.lat}, {bounds.ne.lng}), sw({bounds.sw.lat}, {bounds.sw.lng}))
-                </Typography>
+                <Stack direction='column'>
+                    <Typography p={1} variant='caption'>
+                        Zoom({zoom})
+                        Coord({coord.lat},{coord.lng})
+                        Center({centerCoord.lat}, {centerCoord.lng})
+                    </Typography>
+                    <Typography p={1} variant='caption'>
+                        Bound (ne({bounds.ne.lat}, {bounds.ne.lng}), sw({bounds.sw.lat}, {bounds.sw.lng}))
+                    </Typography>
+                </Stack>
             </LoadScript>
         </>
     )
