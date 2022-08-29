@@ -27,7 +27,7 @@ const InitialOptions = {
     scaleControl: true,
     streetViewControl: true,
     rotateControl: true,
-    fullscreenControl: false
+    fullscreenControl: true
 }
 
 
@@ -37,11 +37,11 @@ export function MapContextProvider({ children }) {
     const [centerCoord, setCenterCoord] = useState(InitialCenterCoord)
     const [bounds, setBounds] = useState(InitialBounds)
     const [coord, setCoord] = useState(InitialCenterCoord)
-
+    const [markers, setMarkers] = useState([])
 
     return (
         <mapContext.Provider value={{
-            options, setOptions, zoom, setZoom, coord, setCoord, centerCoord, setCenterCoord, bounds, setBounds
+            options, setOptions, zoom, setZoom, coord, setCoord, centerCoord, setCenterCoord, bounds, setBounds, markers, setMarkers
         }}>
             {children}
         </mapContext.Provider>

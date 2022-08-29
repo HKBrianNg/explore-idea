@@ -8,7 +8,6 @@ import { usePlacesContext } from '../../context/PlacesContext'
 
 function List() {
     const [type, setType] = useState('restaurants')
-    // const [places, setPlaces] = useState([])
     const [isLoading, setIsloading] = useState(false)
     const { bounds } = useMapContext()
     const { places, setPlaces } = usePlacesContext()
