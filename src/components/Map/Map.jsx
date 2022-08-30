@@ -1,14 +1,13 @@
 import { useState, useCallback } from 'react'
 import { GoogleMap, InfoWindow, Marker, useLoadScript, Autocomplete } from '@react-google-maps/api'
-import { Autocomplete as AutocompleteMui, TextField, IconButton, Stack, Box, Typography, InputBase } from '@mui/material'
+import { Autocomplete as AutocompleteMui, TextField, IconButton, Stack, Box, } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useMapContext } from '../../context/MapContext'
 import mapGreenStyles from './mapGreenStyles'
 import mapWhiteStyles from './mapWhiteStyles'
 import mapDarkStyles from './mapDarkStyles'
 import { formatRelative } from 'date-fns';
-import { alpha, shouldSkipGeneratingVar, styled } from '@mui/material/styles'
-import SearchIcon from '@mui/icons-material/Search'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 
 const styleList = [
@@ -20,44 +19,6 @@ const styleList = [
 
 const libraries = ["places"]
 
-const StyledTypography = styled(Typography)(({ theme }) => ({
-    display: "none",
-    [theme.breakpoints.up('sm')]: {
-        display: 'block',
-    },
-}));
-
-const StyledIcon = styled("div")(({ theme }) => ({
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const Search = styled("div")(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.25) },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: { marginLeft: theme.spacing(3), width: 'auto' },
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    border: '1px solid',
-    borderRadius: '5px',
-    marginTop: 5,
-    marginLeft: 30,
-    paddingLeft: 10,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: { width: '40ch' },
-}));
 
 function Map() {
     const { isLoaded, loadError } = useLoadScript({
@@ -69,7 +30,7 @@ function Map() {
     const [value, setValue] = useState(styleList[0])
     const [searchValue, setSearchValue] = useState('')
     const [mapref, setMapRef] = useState(null);
-    const { options, setOptions, zoom, setZoom, setCoord, centerCoord, setCenterCoord,
+    const { options, setOptions, zoom, setZoom, setCoord, centerCoord, setCenterCoord, setBounds,
         markers, setMarkers, selected, setSelected } = useMapContext()
 
     const onLoad = (autoC) => {
@@ -119,12 +80,18 @@ function Map() {
             time: new Date(),
         }])
         setCoord({ lat: event.latLng.lat(), lng: event.latLng.lng() })
+        if (mapref) {
+            setBounds({
+                ne: { lat: mapref.getBounds().getNorthEast().lat(), lng: mapref.getBounds().getNorthEast().lng() },
+                sw: { lat: mapref.getBounds().getSouthWest().lat(), lng: mapref.getBounds().getSouthWest().lng() }
+            })
+        }
 
-        // setBounds({
-        //     ne: { lat: mapref.getBounds().getNorthEast().lat(), lng: mapref.getBounds().getNorthEast().lng() },
-        //     sw: { lat: mapref.getBounds().getSouthWest().lat(), lng: mapref.getBounds().getSouthWest().lng() }
-        // })
     }, [])
+
+    const clearMarkers = () => {
+        setMarkers([])
+    }
 
     const handleMapStyleChange = (event, newValue) => {
         setValue(newValue)
@@ -172,12 +139,9 @@ function Map() {
                     InputProps={{ inputProps: { max: 180, min: -179 } }} />
                 <Box display='flex'>
                     <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-                        <Search>
-                            <StyledIcon>
-                                <SearchIcon fontSize='medium' />
-                            </StyledIcon>
-                            <StyledInputBase placeholder="Search..." value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
-                        </Search>
+                        <TextField variant="outlined" label='Places' size='small' value={searchValue} onChange={(e) => setSearchValue(e.target.value)}
+                            sx={{ width: 300, margin: 1, padding: 0 }}
+                            InputProps={{ inputProps: { max: 180, min: -179 }, }} />
                     </Autocomplete>
                 </Box>
             </Stack>
@@ -186,6 +150,13 @@ function Map() {
                     sx={{ position: 'absolute', top: '1px', left: '180px', zIndex: 10, margin: 0, padding: 2, }}
                 >
                     <MyLocationIcon />
+                </IconButton>
+            </div>
+            <div style={{ position: 'relative', cursor: 'pointer' }}>
+                <IconButton size='small' onClick={clearMarkers}
+                    sx={{ position: 'absolute', top: '1px', left: '230px', zIndex: 10, margin: 0, padding: 2, }}
+                >
+                    <HighlightOffIcon />
                 </IconButton>
             </div>
             <GoogleMap
@@ -214,8 +185,9 @@ function Map() {
                 {selected ? (
                     <InfoWindow position={{ lat: selected.lat, lng: selected.lng }} onCloseClick={() => { setSelected(null) }}>
                         <div>
-                            <h2>Bear Spotted!</h2>
-                            <p>Spotted {formatRelative(selected.time, new Date())}</p>
+                            <h5>Marked { }
+                                {formatRelative(selected.time, new Date())}
+                            </h5>
                         </div>
                     </InfoWindow>
                 ) : null}
