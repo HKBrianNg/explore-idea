@@ -38,10 +38,13 @@ export function MapContextProvider({ children }) {
     const [bounds, setBounds] = useState(InitialBounds)
     const [coord, setCoord] = useState(InitialCenterCoord)
     const [markers, setMarkers] = useState([])
+    const [selected, setSelected] = useState(null)
+
 
     return (
         <mapContext.Provider value={{
-            options, setOptions, zoom, setZoom, coord, setCoord, centerCoord, setCenterCoord, bounds, setBounds, markers, setMarkers
+            options, setOptions, zoom, setZoom, coord, setCoord, centerCoord, setCenterCoord, bounds, setBounds, markers, setMarkers,
+            selected, setSelected
         }}>
             {children}
         </mapContext.Provider>
