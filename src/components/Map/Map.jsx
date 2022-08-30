@@ -1,14 +1,12 @@
 import { useState, useCallback } from 'react'
-import { GoogleMap, InfoWindow, LoadScript, Marker, useLoadScript } from '@react-google-maps/api'
-import { Typography, Autocomplete, TextField, IconButton, Stack, Paper } from '@mui/material'
+import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api'
+import { Autocomplete, TextField, IconButton, Stack, } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useMapContext } from '../../context/MapContext'
-import { usePlacesContext } from '../../context/PlacesContext';
+// import { usePlacesContext } from '../../context/PlacesContext';
 import mapGreenStyles from './mapGreenStyles'
 import mapWhiteStyles from './mapWhiteStyles'
 import mapDarkStyles from './mapDarkStyles'
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import defaultImage from '../../images/Restaurant-Placeholder-001.jpg'
 import { formatRelative } from 'date-fns';
 import usePlacesAutocomplete from 'use-places-autocomplete';
 
@@ -32,9 +30,9 @@ function Map() {
 
     const [value, setValue] = useState(styleList[0]);
     const [mapref, setMapRef] = useState(null);
-    const { options, setOptions, zoom, setZoom, coord, setCoord, centerCoord, setCenterCoord, bounds, setBounds,
+    const { options, setOptions, zoom, setZoom, setCoord, centerCoord, setCenterCoord,
         markers, setMarkers, selected, setSelected } = useMapContext()
-    const { places } = usePlacesContext()
+    // const { places } = usePlacesContext()
 
     const Search = () => {
         const { ready, value, suggestions: { status, data }, setValue, clearSuggestion } = usePlacesAutocomplete({
@@ -43,10 +41,6 @@ function Map() {
                 radius: 200 * 1000,
             }
         })
-    }
-
-    const handleOnLoad = (map) => {
-        setMapRef(map)
     }
 
     const handleCenterChanged = () => {
@@ -116,7 +110,6 @@ function Map() {
             setZoom(11)
         })
     }
-
 
 
     if (loadError) return "Error Loading Maps"

@@ -32,7 +32,7 @@ function PlaceDetails({ place }) {
                 </Box>
                 {place?.awards?.map((award, i) => (
                     <Box key={i} display="flex" justifyContent="space-between" my={1} alignItems="center">
-                        <img src={award.images.small} />
+                        <img src={award.images.small} alt="" />
                         <Typography variant="subtitle2" color="textSecondary">{award.display_name}</Typography>
                     </Box>
                 ))}
