@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react'
-import { GoogleMap, InfoWindow, Marker, useLoadScript } from '@react-google-maps/api'
-import { Autocomplete, TextField, IconButton, Stack, } from '@mui/material'
+import { GoogleMap, InfoWindow, Marker, useLoadScript, Autocomplete } from '@react-google-maps/api'
+import { Autocomplete as AutocompleteMui, TextField, IconButton, Stack, Box, Typography, InputBase } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import { useMapContext } from '../../context/MapContext'
-// import { usePlacesContext } from '../../context/PlacesContext';
 import mapGreenStyles from './mapGreenStyles'
 import mapWhiteStyles from './mapWhiteStyles'
 import mapDarkStyles from './mapDarkStyles'
 import { formatRelative } from 'date-fns';
-import usePlacesAutocomplete from 'use-places-autocomplete';
+import { alpha, shouldSkipGeneratingVar, styled } from '@mui/material/styles'
+import SearchIcon from '@mui/icons-material/Search'
 
 
 const styleList = [
@@ -20,27 +20,66 @@ const styleList = [
 
 const libraries = ["places"]
 
+const StyledTypography = styled(Typography)(({ theme }) => ({
+    display: "none",
+    [theme.breakpoints.up('sm')]: {
+        display: 'block',
+    },
+}));
+
+const StyledIcon = styled("div")(({ theme }) => ({
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+}));
+
+const Search = styled("div")(({ theme }) => ({
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.25) },
+    marginRight: theme.spacing(2),
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: { marginLeft: theme.spacing(3), width: 'auto' },
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    border: '1px solid',
+    borderRadius: '5px',
+    marginTop: 5,
+    marginLeft: 30,
+    paddingLeft: 10,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: { width: '40ch' },
+}));
+
 function Map() {
     const { isLoaded, loadError } = useLoadScript({
-        // googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         googleMapsApiKey: "AIzaSyDyoQSxwHVG2HkR7mfplO--zn4l2ItFSvY",
         libraries
     })
     const mapContainerStyle = { width: '100%', height: '80vh' }
-
-    const [value, setValue] = useState(styleList[0]);
+    const [autocomplete, setAutocomplete] = useState(null)
+    const [value, setValue] = useState(styleList[0])
+    const [searchValue, setSearchValue] = useState('')
     const [mapref, setMapRef] = useState(null);
     const { options, setOptions, zoom, setZoom, setCoord, centerCoord, setCenterCoord,
         markers, setMarkers, selected, setSelected } = useMapContext()
-    // const { places } = usePlacesContext()
 
-    const Search = () => {
-        const { ready, value, suggestions: { status, data }, setValue, clearSuggestion } = usePlacesAutocomplete({
-            requestOptions: {
-                location: { lat: () => 22.302711, lng: () => 114.177216 },
-                radius: 200 * 1000,
-            }
-        })
+    const onLoad = (autoC) => {
+        setAutocomplete(autoC)
+    }
+
+    const onPlaceChanged = () => {
+        const lat = autocomplete.getPlace().geometry.location.lat()
+        const lng = autocomplete.getPlace().geometry.location.lng()
+        setCenterCoord({ lat, lng })
     }
 
     const handleCenterChanged = () => {
@@ -118,7 +157,7 @@ function Map() {
     return (
         <>
             <Stack direction='row'>
-                <Autocomplete size='small' disablePortal options={styleList} value={value}
+                <AutocompleteMui size='small' disablePortal options={styleList} value={value}
                     onChange={handleMapStyleChange} sx={{ width: 160, margin: 1, padding: 0, }}
                     renderInput={(params) => <TextField {...params} label="Map Styles" />}
                 />
@@ -131,9 +170,16 @@ function Map() {
                 <TextField variant="outlined" type='number' label='Center Longtitude' size='small' value={centerCoord.lng} onChange={handleLngChanged}
                     sx={{ width: 120, margin: 1, padding: 0 }}
                     InputProps={{ inputProps: { max: 180, min: -179 } }} />
-                {/* <Typography p={0} variant='caption'>
-                        Bound (ne({bounds.ne.lat}, {bounds.ne.lng}), sw({bounds.sw.lat}, {bounds.sw.lng}))
-                    </Typography> */}
+                <Box display='flex'>
+                    <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+                        <Search>
+                            <StyledIcon>
+                                <SearchIcon fontSize='medium' />
+                            </StyledIcon>
+                            <StyledInputBase placeholder="Search..." value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
+                        </Search>
+                    </Autocomplete>
+                </Box>
             </Stack>
             <div style={{ position: 'relative', cursor: 'pointer' }}>
                 <IconButton size='small' onClick={getMyLocation}
