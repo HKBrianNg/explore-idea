@@ -28,7 +28,6 @@ function Map() {
     const mapContainerStyle = { width: '100%', height: '80vh' }
     const [autocomplete, setAutocomplete] = useState(null)
     const [value, setValue] = useState(styleList[0])
-    const [searchValue, setSearchValue] = useState('')
     const [mapref, setMapRef] = useState(null);
     const { options, setOptions, zoom, setZoom, setCoord, centerCoord, setCenterCoord, setBounds,
         markers, setMarkers, selected, setSelected } = useMapContext()
@@ -139,7 +138,7 @@ function Map() {
                     InputProps={{ inputProps: { max: 180, min: -179 } }} />
                 <Box display='flex'>
                     <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-                        <TextField variant="outlined" label='Places' size='small' value={searchValue} onChange={(e) => setSearchValue(e.target.value)}
+                        <TextField variant="outlined" label='Places' size='small'
                             sx={{ width: 300, margin: 1, padding: 0 }}
                             InputProps={{ inputProps: { max: 180, min: -179 }, }} />
                     </Autocomplete>
