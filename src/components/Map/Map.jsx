@@ -23,6 +23,7 @@ const libraries = ["places"]
 function Map() {
     const { isLoaded, loadError } = useLoadScript({
         googleMapsApiKey: "AIzaSyDyoQSxwHVG2HkR7mfplO--zn4l2ItFSvY",
+        // googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         libraries
     })
     const mapContainerStyle = { width: '100%', height: '80vh' }
