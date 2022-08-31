@@ -4,10 +4,16 @@ const mapContext = createContext()
 
 // show Hong Kong map as default
 const InitialZoom = 9
+const CaliforniaCoord = {
+    lat: 36.778261,
+    lng: -119.4179324
+}
+
 const InitialCenterCoord = {
     lat: 22.302711,
     lng: 114.177216
 }
+
 const InitialBounds = {
     ne: {
         lat: 23.033882353080422,
@@ -34,7 +40,7 @@ const InitialOptions = {
 export function MapContextProvider({ children }) {
     const [options, setOptions] = useState(InitialOptions)
     const [zoom, setZoom] = useState(InitialZoom)
-    const [centerCoord, setCenterCoord] = useState(InitialCenterCoord)
+    const [centerCoord, setCenterCoord] = useState(CaliforniaCoord)
     const [bounds, setBounds] = useState(InitialBounds)
     const [coord, setCoord] = useState(InitialCenterCoord)
     const [markers, setMarkers] = useState([])

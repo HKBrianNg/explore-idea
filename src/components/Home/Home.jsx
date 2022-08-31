@@ -1,6 +1,7 @@
-import { CssBaseline, Grid, Box } from '@mui/material';
+import { CssBaseline, Grid, Box } from '@mui/material'
 import Header from '../Header/Header'
-import List from '../List/List'
+import GolfCourseList from '../List/GolfCourseList'
+// import List from '../List/List'
 import Map from '../Map/Map'
 
 
@@ -13,7 +14,7 @@ function Home() {
             <Box m={1}>
                 <Grid container spacing={1} style={{ width: '100%' }}>
                     <Grid item xs={12} md={4}>
-                        <List />
+                        <GolfCourseList />
                     </Grid>
                     <Grid item xs={12} md={8}>
                         <Map />

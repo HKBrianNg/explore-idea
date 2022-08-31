@@ -2,13 +2,13 @@ import { useState, useCallback } from 'react'
 import { GoogleMap, InfoWindow, Marker, useLoadScript, Autocomplete } from '@react-google-maps/api'
 import { Autocomplete as AutocompleteMui, TextField, IconButton, Stack, Box, } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation';
-import { useMapContext } from '../../context/MapContext'
 import mapGreenStyles from './mapGreenStyles'
 import mapWhiteStyles from './mapWhiteStyles'
 import mapDarkStyles from './mapDarkStyles'
 import { formatRelative } from 'date-fns';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-
+import { useMapContext } from '../../context/MapContext'
+import { useGolfCoursesContext } from '../../context/GolfCoursesContext';
 
 const styleList = [
     'default',
@@ -32,6 +32,7 @@ function Map() {
     const [mapref, setMapRef] = useState(null);
     const { options, setOptions, zoom, setZoom, setCoord, centerCoord, setCenterCoord, setBounds,
         markers, setMarkers, selected, setSelected } = useMapContext()
+    const { golfCourses, setGolfCourses, getGolfCourses } = useGolfCoursesContext()
 
     const onLoad = (autoC) => {
         setAutocomplete(autoC)
