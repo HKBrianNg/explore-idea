@@ -221,13 +221,6 @@ function Map() {
                     <MyLocationIcon />
                 </IconButton>
             </div>
-            {/* <div style={{ position: 'relative', cursor: 'pointer' }}>
-                <IconButton size='small' onClick={clearMarkers}
-                    sx={{ position: 'absolute', top: '1px', left: '230px', zIndex: 10, margin: 0, padding: 2, }}
-                >
-                    <HighlightOffIcon />
-                </IconButton>
-            </div> */}
             <GoogleMap
                 mapContainerStyle={mapContainerStyle}
                 center={centerCoord}
@@ -253,13 +246,13 @@ function Map() {
                 ))}
                 {selected ? (
                     <InfoWindow position={{ lat: selected.lat, lng: selected.lng }} onCloseClick={() => { setSelected(null) }}>
-                        <div>
+                        <Box>
                             <Typography variant='h5'>Marked&nbsp; {formatRelative(selected.time, new Date())}</Typography>
                             <Stack direction='row'>
                                 <img src={selected.icon} alt="" style={{ width: '30px', height: '30px' }} />
                                 <Typography variant='h5' ml={1}>{selected.name}</Typography>
                             </Stack>
-                        </div>
+                        </Box>
                     </InfoWindow>
                 ) : null}
             </GoogleMap>
