@@ -25,20 +25,7 @@ const InitialBounds = {
     }
 }
 
-const InitialOptions = {
-    styles: null,
-    disableDefaultUI: true,
-    zoomControl: true,
-    mapTypeControl: true,
-    scaleControl: true,
-    streetViewControl: true,
-    rotateControl: true,
-    fullscreenControl: true
-}
-
-
 export function MapContextProvider({ children }) {
-    const [options, setOptions] = useState(InitialOptions)
     const [zoom, setZoom] = useState(InitialZoom)
     const [centerCoord, setCenterCoord] = useState(CaliforniaCoord)
     const [bounds, setBounds] = useState(InitialBounds)
@@ -49,7 +36,7 @@ export function MapContextProvider({ children }) {
 
     return (
         <mapContext.Provider value={{
-            options, setOptions, zoom, setZoom, coord, setCoord, centerCoord, setCenterCoord, bounds, setBounds, markers, setMarkers,
+            zoom, setZoom, coord, setCoord, centerCoord, setCenterCoord, bounds, setBounds, markers, setMarkers,
             selected, setSelected
         }}>
             {children}

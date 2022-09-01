@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { GoogleMap, InfoWindow, Marker, useLoadScript, Autocomplete } from '@react-google-maps/api'
-import { Autocomplete as AutocompleteMui, TextField, IconButton, Stack, Box, } from '@mui/material'
+import { Autocomplete as AutocompleteMui, TextField, IconButton, Stack, Box, Typography } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import mapGreenStyles from './mapGreenStyles'
 import mapWhiteStyles from './mapWhiteStyles'
@@ -19,6 +19,51 @@ const styleList = [
 
 const libraries = ["places"]
 
+const defaultOptions = {
+    strokeOpacity: 0.5,
+    strokeWeight: 2,
+    clickable: false,
+    draggable: false,
+    editable: false,
+    visible: true,
+}
+const closeOptions = {
+    ...defaultOptions,
+    zIndex: 3,
+    fillOpacity: 0.05,
+    strokeColor: "#8BC34A",
+    fillColor: "#8BC34A",
+}
+
+const middleOptions = {
+    ...defaultOptions,
+    zIndex: 2,
+    fillOpacity: 0.05,
+    strokeColor: "#FBC02D",
+    fillColor: "#FB02D",
+}
+
+const farOptions = {
+    ...defaultOptions,
+    zIndex: 1,
+    fillOpacity: 0.05,
+    strokeColor: "#FF5252",
+    fillColor: "#FF5252",
+}
+
+const initialMapOptions = {
+    styles: null,
+    disableDefaultUI: true,
+    zoomControl: true,
+    mapTypeControl: true,
+    scaleControl: true,
+    streetViewControl: true,
+    rotateControl: true,
+    fullscreenControl: true,
+    clickableIcons: true
+}
+
+const mapContainerStyle = { width: '100%', height: '80vh' }
 
 function Map() {
     const { isLoaded, loadError } = useLoadScript({
@@ -26,29 +71,46 @@ function Map() {
         // googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
         libraries
     })
-    const mapContainerStyle = { width: '100%', height: '80vh' }
     const [autocomplete, setAutocomplete] = useState(null)
+    const [mapOptions, setMapOptions] = useState(initialMapOptions)
+    const [searchValue, setSearchValue] = useState('')
     const [value, setValue] = useState(styleList[0])
     const [mapref, setMapRef] = useState(null);
-    const { options, setOptions, zoom, setZoom, setCoord, centerCoord, setCenterCoord, setBounds,
+    const { zoom, setZoom, setCoord, centerCoord, setCenterCoord, setBounds,
         markers, setMarkers, selected, setSelected } = useMapContext()
     const { golfCourses, setGolfCourses, getGolfCourses } = useGolfCoursesContext()
+
+    // const center = useMemo(() => ({ lat: centerCoord.lat, lng: centerCoord.lng }), [centerCoord])
 
     const onLoad = (autoC) => {
         setAutocomplete(autoC)
     }
 
     const onPlaceChanged = () => {
+        console.log("place:", autocomplete.getPlace())
         const lat = autocomplete.getPlace().geometry.location.lat()
         const lng = autocomplete.getPlace().geometry.location.lng()
+        const icon = autocomplete.getPlace().icon
+        const name = autocomplete.getPlace().name
+        setMarkers(current => [...current, {
+            lat: lat,
+            lng: lng,
+            time: new Date(),
+            icon: icon,
+            name: name
+        }])
+        console.log("Icon:", icon)
+        console.log("Name:", name)
+
         setCenterCoord({ lat, lng })
+        setZoom(4)
     }
 
     const handleCenterChanged = () => {
         if (mapref) {
             setTimeout(() => {
                 setCenterCoord({ lat: mapref.getCenter().lat(), lng: mapref.getCenter().lng() })
-            }, 2000);
+            }, 1000);
         }
     }
 
@@ -75,39 +137,40 @@ function Map() {
     }, [])
 
     const onMapClick = useCallback((event) => {
-        setMarkers(current => [...current, {
-            lat: event.latLng.lat(),
-            lng: event.latLng.lng(),
-            time: new Date(),
-        }])
-        setCoord({ lat: event.latLng.lat(), lng: event.latLng.lng() })
-        if (mapref) {
-            setBounds({
-                ne: { lat: mapref.getBounds().getNorthEast().lat(), lng: mapref.getBounds().getNorthEast().lng() },
-                sw: { lat: mapref.getBounds().getSouthWest().lat(), lng: mapref.getBounds().getSouthWest().lng() }
-            })
-        }
+        // setMarkers(current => [...current, {
+        //     lat: event.latLng.lat(),
+        //     lng: event.latLng.lng(),
+        //     time: new Date(),
+        // }])
+        // setCoord({ lat: event.latLng.lat(), lng: event.latLng.lng() })
+        // if (mapref) {
+        //     setBounds({
+        //         ne: { lat: mapref.getBounds().getNorthEast().lat(), lng: mapref.getBounds().getNorthEast().lng() },
+        //         sw: { lat: mapref.getBounds().getSouthWest().lat(), lng: mapref.getBounds().getSouthWest().lng() }
+        //     })
+        // }
 
     }, [])
 
     const clearMarkers = () => {
         setMarkers([])
+        setSearchValue('')
     }
 
     const handleMapStyleChange = (event, newValue) => {
         setValue(newValue)
         switch (newValue) {
             case 'WhiteStyles':
-                setOptions({ ...options, styles: mapWhiteStyles })
+                setMapOptions({ ...mapOptions, styles: mapWhiteStyles })
                 break
             case 'GreenStyles':
-                setOptions({ ...options, styles: mapGreenStyles })
+                setMapOptions({ ...mapOptions, styles: mapGreenStyles })
                 break
             case 'DarkStyles':
-                setOptions({ ...options, styles: mapDarkStyles })
+                setMapOptions({ ...mapOptions, styles: mapDarkStyles })
                 break
             default:
-                setOptions({ ...options, styles: null })
+                setMapOptions({ ...mapOptions, styles: null })
         }
     }
 
@@ -139,11 +202,16 @@ function Map() {
                     sx={{ width: 120, margin: 1, padding: 0 }}
                     InputProps={{ inputProps: { max: 180, min: -179 } }} />
                 <Box display='flex'>
-                    <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-                        <TextField variant="outlined" label='Places' size='small'
+                    <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}
+                        options={{ fields: ["geometry", "icon", "name"] }}
+                    >
+                        <TextField variant="outlined" label='Places' size='small' value={searchValue} onChange={(e) => setSearchValue(e.target.value)}
                             sx={{ width: 300, margin: 1, padding: 0 }}
                             InputProps={{ inputProps: { max: 180, min: -179 }, }} />
                     </Autocomplete>
+                    <IconButton size='small' onClick={clearMarkers} >
+                        <HighlightOffIcon />
+                    </IconButton>
                 </Box>
             </Stack>
             <div style={{ position: 'relative', cursor: 'pointer' }}>
@@ -153,18 +221,18 @@ function Map() {
                     <MyLocationIcon />
                 </IconButton>
             </div>
-            <div style={{ position: 'relative', cursor: 'pointer' }}>
+            {/* <div style={{ position: 'relative', cursor: 'pointer' }}>
                 <IconButton size='small' onClick={clearMarkers}
                     sx={{ position: 'absolute', top: '1px', left: '230px', zIndex: 10, margin: 0, padding: 2, }}
                 >
                     <HighlightOffIcon />
                 </IconButton>
-            </div>
+            </div> */}
             <GoogleMap
                 mapContainerStyle={mapContainerStyle}
                 center={centerCoord}
                 zoom={zoom}
-                options={options}
+                options={mapOptions}
                 onLoad={onMapLoad}
                 onCenterChanged={handleCenterChanged}
                 onClick={onMapClick}
@@ -186,9 +254,11 @@ function Map() {
                 {selected ? (
                     <InfoWindow position={{ lat: selected.lat, lng: selected.lng }} onCloseClick={() => { setSelected(null) }}>
                         <div>
-                            <h5>Marked { }
-                                {formatRelative(selected.time, new Date())}
-                            </h5>
+                            <Typography variant='h5'>Marked&nbsp; {formatRelative(selected.time, new Date())}</Typography>
+                            <Stack direction='row'>
+                                <img src={selected.icon} alt="" style={{ width: '30px', height: '30px' }} />
+                                <Typography variant='h5' ml={1}>{selected.name}</Typography>
+                            </Stack>
                         </div>
                     </InfoWindow>
                 ) : null}
