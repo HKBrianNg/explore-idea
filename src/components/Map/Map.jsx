@@ -187,6 +187,11 @@ function Map() {
         })
     }
 
+    const onMarkerClick = (marker) => {
+        setSelected(marker)
+        setCenterCoord({ lat: marker.lat, lng: marker.lng })
+        setZoom(10)
+    }
 
     if (loadError) return "Error Loading Maps"
     if (!isLoaded) return "Loading Maps"
@@ -247,7 +252,7 @@ function Map() {
                             origin: new window.google.maps.Point(0, 0),
                             anchor: new window.google.maps.Point(15, 15)
                         }}
-                        onClick={() => { setSelected(marker) }}
+                        onClick={(e) => onMarkerClick(marker)}
                     />
 
                 ))}
