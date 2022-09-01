@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { GoogleMap, InfoWindow, Marker, useLoadScript, Autocomplete } from '@react-google-maps/api'
+import { GoogleMap, InfoWindow, Marker, useLoadScript, Autocomplete, Circle } from '@react-google-maps/api'
 import { Autocomplete as AutocompleteMui, TextField, IconButton, Stack, Box, Typography } from '@mui/material'
 import MyLocationIcon from '@mui/icons-material/MyLocation';
 import mapGreenStyles from './mapGreenStyles'
@@ -92,26 +92,32 @@ function Map() {
         const lng = autocomplete.getPlace().geometry.location.lng()
         const icon = autocomplete.getPlace().icon
         const name = autocomplete.getPlace().name
+        const ne = { lat: autocomplete.getPlace().geometry.viewport.yb.hi, lng: autocomplete.getPlace().geometry.viewport.Qa.hi }
+        const sw = { lat: autocomplete.getPlace().geometry.viewport.yb.lo, lng: autocomplete.getPlace().geometry.viewport.Qa.lo }
         setMarkers(current => [...current, {
             lat: lat,
             lng: lng,
             time: new Date(),
             icon: icon,
+            ne: ne,
+            sw: sw,
             name: name
         }])
         console.log("Icon:", icon)
         console.log("Name:", name)
+        console.log("ne", ne)
+        console.log("sw", sw)
 
         setCenterCoord({ lat, lng })
         setZoom(4)
     }
 
     const handleCenterChanged = () => {
-        if (mapref) {
-            setTimeout(() => {
-                setCenterCoord({ lat: mapref.getCenter().lat(), lng: mapref.getCenter().lng() })
-            }, 1000);
-        }
+        // if (mapref) {
+        //     setTimeout(() => {
+        //         setCenterCoord({ lat: mapref.getCenter().lat(), lng: mapref.getCenter().lng() })
+        //     }, 1000);
+        // }
     }
 
     const handleOnZoomChanged = () => {
@@ -231,7 +237,7 @@ function Map() {
                 onClick={onMapClick}
                 onZoomChanged={handleOnZoomChanged}
             >
-                {markers.map(marker => (
+                {markers.map((marker) => (
                     <Marker
                         key={marker.time.toISOString()}
                         position={{ lat: marker.lat, lng: marker.lng }}
@@ -243,8 +249,18 @@ function Map() {
                         }}
                         onClick={() => { setSelected(marker) }}
                     />
+
                 ))}
-                {selected ? (
+                {markers.map((marker) => (
+                    <Circle key={marker.time.toISOString()} center={{ lat: marker.lat, lng: marker.lng }} radius={10000} options={closeOptions} />
+                ))}
+                {markers.map((marker) => (
+                    <Circle key={marker.time.toISOString()} center={{ lat: marker.lat, lng: marker.lng }} radius={20000} options={middleOptions} />
+                ))}
+                {markers.map((marker) => (
+                    <Circle key={marker.time.toISOString()} center={{ lat: marker.lat, lng: marker.lng }} radius={30000} options={farOptions} />
+                ))}
+                {selected && (
                     <InfoWindow position={{ lat: selected.lat, lng: selected.lng }} onCloseClick={() => { setSelected(null) }}>
                         <Box>
                             <Typography variant='h5'>Marked&nbsp; {formatRelative(selected.time, new Date())}</Typography>
@@ -254,7 +270,7 @@ function Map() {
                             </Stack>
                         </Box>
                     </InfoWindow>
-                ) : null}
+                )}
             </GoogleMap>
         </>
     )
